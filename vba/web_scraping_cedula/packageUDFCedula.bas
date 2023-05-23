@@ -10,11 +10,6 @@ Const DOS_ULTIM_DIG_DOCUMENTO = "¿Escriba los dos ultimos digitos del documento 
 Const TRES_PRIM_DIG_DOCUMENTO = "¿Escriba los tres primeros digitos del documento a consultar?"
 Const CANT_LETRAS_PRIMER_NOMBRE = "¿Escriba la cantidad de letras del primer nombre de la persona a la cual esta expidiendo el certificado?"
 
-Type fullName
-    name As String
-    lastName As String
-End Type
-
 Function searchPersonForCedula(ByVal cedula As String) As String
     
     Dim c As New ChromeDriver
@@ -43,7 +38,7 @@ Function searchPersonForCedula(ByVal cedula As String) As String
     Do
         recaptcha = False
         Rem recupera pregunta
-        getQuestion = c.FindElementById("lblPregunta").text
+        getQuestion = c.FindElementById("lblPregunta").Text
         
         Rem procesa la pregunta
         getAnswer = answerCaptcha(getQuestion, cedula, recaptcha)
@@ -53,47 +48,30 @@ Function searchPersonForCedula(ByVal cedula As String) As String
         
         If recaptcha Then
             c.FindElementById("ImageButton1").Click
-            c.Wait 1000
+            c.wait 1000
         End If
         
     Loop While recaptcha
 
     c.FindElementById("btnConsultar").Click
 
-    c.Wait 2000
+    c.wait 2000
     
     Set spans = c.FindElementsByCss("#divSec span")
     Set div = c.FindElementByCss("#ValidationSummary1")
-    noFound = Trim(div.text)
+    noFound = Trim(div.Text)
     
-    
-    Rem---------------
-    Rem separamos nombre de apellidos
-    Dim surnames As String
-    Dim names As String
-
-    surnames = spans.Item(spans.Count - 1).text & " " & spans.Item(spans.Count).text
-    
-    For i = 1 To spans.Count - 2
-        names = names & " " & spans.Item(i).text
-    Next i
-        
-    names = Trim(names)
-    
-    fullName = names & "," & surnames
-    Rem---------------
-    
-'    For Each span In spans
-''        Debug.Print span.Text
-'        fullName = fullName & " " & span.text
-'    Next span
+    For Each span In spans
+'        Debug.Print span.Text
+        fullName = fullName & " " & span.Text
+    Next span
     
 '    MsgBox c.FindElementByClass("datosConsultado").Text
 '    MsgBox fullName
     c.Close
     
     If fullName <> Empty Then
-        searchPersonForCedula = Trim(fullName)
+        searchPersonForCedula = fullName
     ElseIf noFound <> Empty Then
         searchPersonForCedula = "No registrado"
     Else
@@ -119,9 +97,9 @@ Function answer(ByVal question) As String
         
         Set rMatch = .Execute(question)
         
-        If rMatch.Count > 0 Then
+        If rMatch.count > 0 Then
 '            MsgBox rMatch.Item(0)
-            For i = 0 To rMatch.Count - 1
+            For i = 0 To rMatch.count - 1
                 Debug.Print rMatch.Item(i)
             Next i
         End If
@@ -167,7 +145,7 @@ Function answerOperationMath(ByVal question As String) As Variant
         
         Set rMatch = .Execute(question)
         
-        If rMatch.Count = 1 Then
+        If rMatch.count = 1 Then
 '            MsgBox rMatch.Item(0)
             answerOperationMath = Replace( _
                                     Replace(rMatch.Item(0), " ", "") _
@@ -193,7 +171,7 @@ Function answerOperationMath2(ByVal question As String) As Variant
         
         Set rMatch = .Execute(question)
         
-        If rMatch.Count > 0 Then
+        If rMatch.count > 0 Then
             num1 = rMatch.Item(0)
             operator = rMatch.Item(1)
             num2 = rMatch.Item(2)
@@ -212,18 +190,3 @@ Function answerOperationMath2(ByVal question As String) As Variant
     End With
     
 End Function
-
-Sub separate(ByVal text As String)
-    
-    Dim arrFullName() As String
-    Dim fn As fullName
-    
-    If text <> "Error" Or text <> Empty Then
-        arrFullName = Split(text, " ")
-        
-        fn.lastName = arrFullName(UBound(arrFullName) - 1) & arrFullName(UBound(arrFullName))
-    End If
-    
-End Sub
-
-

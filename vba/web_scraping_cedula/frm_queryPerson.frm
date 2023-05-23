@@ -13,6 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 Private Const APP_NAME = "Consultar por cédula"
 
 Private Sub cmd_search_Click()
@@ -34,13 +35,8 @@ Private Sub cmd_searchBatch_Click()
     Dim rng As Range
     Dim c As Integer, i As Integer
     Dim cedula As Variant
-    
-    Dim surnames As String
-    Dim name As String
-    Dim lastName As String
-    Dim arrFullNams() As String
 
-    If ActiveSheet.name <> NAME_SH Then
+    If ActiveSheet.Name <> NAME_SH Then
         MsgBox "La hoja actual no es " & NAME_SH, vbCritical, APP_NAME
         Exit Sub
     End If
@@ -54,16 +50,7 @@ Private Sub cmd_searchBatch_Click()
         
         If IsNumeric(cedula) Then
             With WorksheetFunction
-                surnames = .Proper(searchPersonForCedula(cedula))
-                arrFullNams = Split(surnames, ",")
-                name = arrFullNams(0)
-                lastName = arrFullNams(1)
-                
-                Range("B" & i).ClearContents
-                Range("B" & i).Value = name
-                
-                Range("C" & i).ClearContents
-                Range("C" & i).Value = lastName
+                Range("B" & i).Value = .Proper(searchPersonForCedula(cedula))
                 Range("B" & i).Font.Color = vbBlack
             End With
         Else
@@ -79,7 +66,7 @@ End Sub
 
 
 Private Sub UserForm_Initialize()
-  
+    txt_cedula = 1052406961
     
 '    Me.BackColor = RGB(166, 199, 248)
 '    For i = 1 To 3
